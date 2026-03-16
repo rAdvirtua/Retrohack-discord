@@ -3,6 +3,7 @@ from discord.ext import commands
 import sqlite3
 import os
 from dotenv import load_dotenv
+from keep_alive import keep_alive
 
 load_dotenv()
 # You will paste your actual bot token here
@@ -109,5 +110,5 @@ bot = HackathonBot()
 @commands.has_permissions(administrator=True)
 async def setup_verification(ctx):
     await ctx.send("Welcome to the Hackathon! Click below to enter your Team Code.", view=VerificationView())
-
+keep_alive()
 bot.run(TOKEN)
