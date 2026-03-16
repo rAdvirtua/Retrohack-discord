@@ -9,26 +9,30 @@
         :root {
             --neon-cyan: #22d3ee;
             --neon-pink: #ec4899;
-            --overlay-blue: rgba(10, 10, 35, 0.65); /* Blue overlay effect */
+            --scroll: 0; /* Updated by JS */
         }
 
         body {
             margin: 0;
             padding: 0;
             font-family: 'Press Start 2P', cursive;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Layered Background: Gradient Overlay + Pixel Art */
-            background: 
-                linear-gradient(var(--overlay-blue), var(--overlay-blue)),
-                url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            min-height: 200vh; /* Necessary to allow scrolling for the effect */
             color: #fff;
-            overflow-x: hidden;
+            background-color: #020205;
+        }
+
+        /* DYNAMIC OVERLAY BACKGROUND */
+        #dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            transition: background 0.1s ease-out;
         }
 
         /* CRT SCANLINE OVERLAY */
@@ -44,17 +48,27 @@
             opacity: 0.4;
         }
 
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 10vh;
+            padding-bottom: 20vh;
+        }
+
         .card {
-            background: rgba(15, 15, 35, 0.8);
-            backdrop-filter: blur(20px) saturate(150%);
-            -webkit-backdrop-filter: blur(20px) saturate(150%);
-            padding: 30px;
+            background: rgba(10, 10, 25, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 35px;
             border: 2px solid var(--neon-cyan);
             border-radius: 4px;
             width: 90%;
             max-width: 420px;
-            box-shadow: inset 0 1px 1px 0 rgba(255,255,255,0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(34,211,238,0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,1), 0 0 20px rgba(34,211,238,0.2);
             z-index: 10;
+            margin-bottom: 50px;
         }
 
         h2 {
@@ -70,7 +84,7 @@
             width: 100%;
             padding: 14px;
             margin: 10px 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border: 1px solid var(--neon-cyan);
             color: var(--neon-cyan);
             font-family: 'Press Start 2P', cursive;
@@ -79,14 +93,9 @@
             outline: none;
         }
 
-        input:focus {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 8px var(--neon-pink);
-        }
-
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: var(--neon-cyan);
             border: none;
             color: #000;
@@ -105,77 +114,104 @@
             transform: translate(-2px, -2px);
         }
 
-        button:active {
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0px #500724;
-        }
-
-        .m-in { border-left: 4px solid var(--neon-pink); }
-
         .msg {
             margin-top: 20px;
             padding: 12px;
             font-size: 8px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px dashed #fff;
-            line-height: 1.8;
         }
-
-        .success { color: #4ade80; border-color: #4ade80; text-shadow: 0 0 5px #4ade80; }
-        .error { color: #f87171; border-color: #f87171; text-shadow: 0 0 5px #f87171; }
 
         .join-btn {
             display: block;
             margin-top: 15px;
             padding: 12px;
-            background: transparent;
             color: var(--neon-pink);
             border: 2px solid var(--neon-pink);
             text-decoration: none;
             text-align: center;
             font-size: 9px;
-            transition: 0.3s;
         }
 
-        .join-btn:hover { background: var(--neon-pink); color: #000; }
         .hidden { display: none; }
 
-        @media (max-width: 480px) {
-            .card { padding: 20px; }
-            h2 { font-size: 14px; }
-            input, select, button { font-size: 9px; }
+        /* PARALLAX SCROLL INDICATOR */
+        .scroll-hint {
+            text-align: center;
+            font-size: 8px;
+            color: var(--neon-cyan);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>RETROHACK_2026<br>NODE_INITIALIZED</h2>
-        
-        <select id="role" onchange="upd()">
-            <option value="leader">ACCESS_LEADER</option>
-            <option value="member">QUERY_MEMBER</option>
-        </select>
 
-        <div id="L">
-            <input type="text" id="tn" placeholder="TEAM_NAME">
-            <input type="text" id="lu" placeholder="DISCORD_USER">
-            <div id="mems"></div>
-            <button onclick="add()" style="background:#fab387; box-shadow: 4px 4px 0px #7c2d12;">+ ADD_UNIT</button>
-            <button onclick="reg()">SUBMIT_DATA</button>
+    <div id="dynamic-bg"></div>
+
+    <div class="container">
+        <header style="height: 60vh; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+            <h1 style="font-size: 30px; text-shadow: 5px 5px 0px #000;">RETRO<span style="color:var(--neon-pink)">HACK</span></h1>
+            <p class="scroll-hint">SCROLL_DOWN_FOR_UPLINK</p>
+        </header>
+
+        <div class="card">
+            <h2>SYSTEM_ACCESS_NODE</h2>
+            
+            <select id="role" onchange="upd()">
+                <option value="leader">LEADER_REGISTRATION</option>
+                <option value="member">STATUS_CHECK</option>
+            </select>
+
+            <div id="L">
+                <input type="text" id="tn" placeholder="TEAM_NAME">
+                <input type="text" id="lu" placeholder="DISCORD_HANDLE">
+                <div id="mems"></div>
+                <button onclick="add()" style="background:#fab387; box-shadow: 4px 4px 0px #7c2d12;">+ ADD_UNIT</button>
+                <button onclick="reg()">INITIALIZE_TEAM</button>
+            </div>
+
+            <div id="M" class="hidden">
+                <input type="text" id="cu" placeholder="DISCORD_HANDLE">
+                <button onclick="chk()" style="background:#cba6f7; box-shadow: 4px 4px 0px #4c1d95;">VERIFY_UPLINK</button>
+            </div>
+
+            <div id="msg" class="msg hidden"></div>
         </div>
-
-        <div id="M" class="hidden">
-            <input type="text" id="cu" placeholder="USER_ID">
-            <button onclick="chk()" style="background:#cba6f7; box-shadow: 4px 4px 0px #4c1d95;">FETCH_STATUS</button>
-        </div>
-
-        <div id="msg" class="msg hidden"></div>
     </div>
 
     <script>
-        const INVITE = "https://discord.gg/YOUR_INVITE"; 
+        const INVITE = "https://discord.gg/YOUR_CODE"; 
 
+        // --- DYNAMIC SCROLL OVERLAY LOGIC ---
+        window.addEventListener('scroll', () => {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPct = window.scrollY / scrollHeight;
+            
+            const bg = document.getElementById('dynamic-bg');
+            
+            // Calculate colors based on your JS snippet logic
+            const opacity = 0.4 + (scrollPct * 0.4);
+            const rTop = 255 - (scrollPct * 150);
+            const gTop = 100 - (scrollPct * 100);
+            const bTop = 50 + (scrollPct * 50);
+            
+            const rBot = 20 - (scrollPct * 20);
+            const gBot = 10 - (scrollPct * 10);
+            const bBot = 40 + (scrollPct * 20);
+
+            const colorTop = `rgba(${rTop}, ${gTop}, ${bTop}, ${opacity})`;
+            const colorBot = `rgba(${rBot}, ${gBot}, ${bBot}, 0.9)`;
+            
+            // Apply the dynamic gradient and move background position
+            bg.style.backgroundImage = `linear-gradient(${colorTop}, ${colorBot}), url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg')`;
+            bg.style.backgroundPosition = `50% ${scrollPct * 100}%`;
+        });
+
+        // --- REGISTRATION LOGIC ---
         function upd() {
             const isL = document.getElementById('role').value === 'leader';
             document.getElementById('L').classList.toggle('hidden', !isL);
@@ -187,13 +223,13 @@
             const container = document.getElementById('mems');
             if (container.children.length >= 4) return;
             const i = document.createElement('input');
-            i.placeholder = "UNIT_ID";
-            i.className = "m-in";
+            i.placeholder = "UNIT_HANDLE";
+            i.style.borderLeft = "4px solid var(--neon-pink)";
             container.appendChild(i);
         }
 
         async function reg() {
-            const usernames = [document.getElementById('lu').value, ...Array.from(document.querySelectorAll('.m-in')).map(x=>x.value)];
+            const usernames = [document.getElementById('lu').value, ...Array.from(document.querySelectorAll('#mems input')).map(x=>x.value)];
             const res = await fetch('/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -210,9 +246,10 @@
         async function hndl(res) {
             const d = await res.json();
             const m = document.getElementById('msg');
-            m.className = `msg ${res.ok ? 'success' : 'error'}`;
+            m.className = `msg ${res.ok ? '' : 'error'}`;
+            m.style.color = res.ok ? "#4ade80" : "#f87171";
             let html = `> ${d.message}`;
-            if (res.ok) html += `<a href="${INVITE}" target="_blank" class="join-btn">ESTABLISH_UPLINK</a>`;
+            if (res.ok) html += `<a href="${INVITE}" target="_blank" class="join-btn">CONNECT_TO_GRID</a>`;
             m.innerHTML = html;
             m.classList.remove('hidden');
         }
