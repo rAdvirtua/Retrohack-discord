@@ -5,38 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RetroHack 2026</title>
     <style>
-        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box;}
+        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
         .card { background: #313244; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #89b4fa; }
         input, select { width: 100%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .hidden { display: none; }
         .msg { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
         .success { background: #a6e3a1; color: #11111b; }
         .error { background: #f38ba8; color: #11111b; }
+        .join-btn { display: block; margin-top: 15px; padding: 12px; background: #11111b; color: #a6e3a1; border: 2px solid #a6e3a1; border-radius: 8px; text-decoration: none; text-align: center; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🚀 RetroHack 2026</h2>
+        <h2 style="text-align: center; color: #89b4fa;">🚀 RetroHack 2026</h2>
         <select id="role" onchange="upd()">
-            <option value="leader">Leader (Register)</option>
-            <option value="member">Member (Check)</option>
+            <option value="leader">Register Team</option>
+            <option value="member">Check Status</option>
         </select>
         <div id="L">
             <input type="text" id="tn" placeholder="Team Name">
             <input type="text" id="lu" placeholder="Your Discord Username">
             <div id="mems"></div>
             <button onclick="add()" style="background:#fab387">+ Teammate</button>
-            <button onclick="reg()">Submit Team</button>
+            <button onclick="reg()">Register</button>
         </div>
         <div id="M" class="hidden">
-            <input type="text" id="cu" placeholder="Your Discord Username">
-            <button onclick="chk()" style="background:#cba6f7">Check Status</button>
+            <input type="text" id="cu" placeholder="Discord Username">
+            <button onclick="chk()" style="background:#cba6f7">Verify Me</button>
         </div>
         <div id="msg" class="msg hidden"></div>
     </div>
     <script>
+        const INVITE = "https://discord.gg/Wq9ce9NByv"; // CHANGE THIS
+
         function upd() {
             const isL = document.getElementById('role').value === 'leader';
             document.getElementById('L').classList.toggle('hidden', !isL);
@@ -44,7 +46,7 @@
         }
         function add() {
             const i = document.createElement('input');
-            i.placeholder = "Teammate Discord Username";
+            i.placeholder = "Teammate Username";
             i.className = "m-in";
             document.getElementById('mems').appendChild(i);
         }
@@ -65,7 +67,9 @@
             const d = await res.json();
             const m = document.getElementById('msg');
             m.className = `msg ${res.ok ? 'success' : 'error'}`;
-            m.innerHTML = d.message + (res.ok ? '<br><br><b>Join the Discord server now!</b>' : '');
+            let html = d.message;
+            if (res.ok) html += `<a href="${INVITE}" target="_blank" class="join-btn">JOIN DISCORD NOW</a>`;
+            m.innerHTML = html;
             m.classList.remove('hidden');
         }
     </script>
