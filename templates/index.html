@@ -1,49 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>RetroHack Register</title>
+    <title>RetroHack | Registration</title>
     <style>
-        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
-        .card { background: #313244; padding: 20px; border-radius: 10px; width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        input { width: 93%; padding: 10px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 5px; }
-        button { width: 100%; padding: 10px; background: #89b4fa; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .gen-btn { background: #f5c2e7; margin-bottom: 10px; }
+        body { background: #1e1e2e; color: #cdd6f4; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 40px; }
+        .card { background: #313244; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        input, select { width: 95%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 6px; }
+        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #11111b; margin-top: 10px;}
+        .hidden { display: none; }
+        .member-entry { border-top: 1px solid #45475a; margin-top: 10px; padding-top: 10px; }
+        .status-msg { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; }
+        .success { background: #a6e3a1; color: #11111b; }
+        .error { background: #f38ba8; color: #11111b; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>Team Registration</h2>
-        <input type="text" id="team_name" placeholder="Team Name">
-        <input type="text" id="discord_username" placeholder="Discord Username (no @)">
+        <h2 style="text-align:center; margin-top:0;">🚀 RetroHack 2026</h2>
         
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="team_code" placeholder="Click Generate" readonly>
-            <button class="gen-btn" onclick="generateCode()" style="width: auto;">Gen</button>
+        <label>Are you a Team Leader?</label>
+        <select id="roleToggle" onchange="toggleRole()">
+            <option value="leader">Yes, I am the Leader</option>
+            <option value="member">No, I am a Member</option>
+        </select>
+
+        <div id="leaderSection">
+            <input type="text" id="team_name" placeholder="Team Name">
+            <input type="text" id="leader_discord" placeholder="Your Discord Username (no @)">
+            
+            <div id="memberContainer">
+                <p style="font-size: 0.8em; color: #9399b2;">Add your teammates' Discord usernames below:</p>
+            </div>
+            <button type="button" onclick="addMemberField()" style="background: #fab387; margin-bottom: 10px;">+ Add Teammate</button>
+            <button onclick="submitRegistration()">Register Team</button>
         </div>
 
-        <button onclick="submitData()">Register Team</button>
-        <p id="msg" style="text-align:center; font-size: 0.9em;"></p>
+        <div id="memberSection" class="hidden">
+            <input type="text" id="check_username" placeholder="Enter your Discord Username">
+            <button onclick="checkStatus()" style="background: #cba6f7;">Check My Team Status</button>
+        </div>
+
+        <div id="msg" class="status-msg hidden"></div>
     </div>
 
     <script>
-        function generateCode() {
-            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-            document.getElementById('team_code').value = code;
+        const DISCORD_LINK = "https://discord.gg/yourlink"; // REPLACE THIS
+
+        function toggleRole() {
+            const isLeader = document.getElementById('roleToggle').value === 'leader';
+            document.getElementById('leaderSection').classList.toggle('hidden', !isLeader);
+            document.getElementById('memberSection').classList.toggle('hidden', isLeader);
+            document.getElementById('msg').classList.add('hidden');
         }
 
-        async function submitData() {
+        function addMemberField() {
+            const container = document.getElementById('memberContainer');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = "Teammate Discord Username";
+            input.className = "teammate-input";
+            container.appendChild(input);
+        }
+
+        async function submitRegistration() {
+            const teammates = Array.from(document.querySelectorAll('.teammate-input')).map(i => i.value.toLowerCase().trim());
+            const usernames = [document.getElementById('leader_discord').value.toLowerCase().trim(), ...teammates];
+            
             const payload = {
                 team_name: document.getElementById('team_name').value,
-                discord_username: document.getElementById('discord_username').value,
-                team_code: document.getElementById('team_code').value
+                usernames: usernames.filter(u => u !== "")
             };
+
             const res = await fetch('/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            document.getElementById('msg').innerText = data.message;
+            showMsg(data.message, res.ok ? 'success' : 'error', res.ok ? DISCORD_LINK : null);
+        }
+
+        async function checkStatus() {
+            const username = document.getElementById('check_username').value.toLowerCase().trim();
+            const res = await fetch(`/status/${username}`);
+            const data = await res.json();
+            showMsg(data.message, res.ok ? 'success' : 'error', res.ok ? DISCORD_LINK : null);
+        }
+
+        function showMsg(text, type, link) {
+            const msgDiv = document.getElementById('msg');
+            msgDiv.className = `status-msg ${type}`;
+            msgDiv.innerHTML = text + (link ? `<br><br><a href="${link}" style="color:inherit; font-weight:bold;">Join Discord Server</a>` : '');
+            msgDiv.classList.remove('hidden');
         }
     </script>
 </body>
