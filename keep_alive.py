@@ -14,27 +14,26 @@ def register_team():
     data = request.json
     team_name = data.get('team_name')
     team_code = data.get('team_code')
+    # Force lowercase for easier matching in bot.py
+    username = data.get('discord_username').lower().replace('@', '')
+
     db_url = os.environ.get("DATABASE_URL")
-    
     try:
         conn = psycopg2.connect(db_url)
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO teams (team_name, team_code) VALUES (%s, %s)", (team_name, team_code))
+        cursor.execute(
+            "INSERT INTO teams (team_name, team_code, discord_username) VALUES (%s, %s, %s)", 
+            (team_name, team_code, username)
+        )
         conn.commit()
-        return jsonify({"message": "Team registered successfully!"}), 200
-    except psycopg2.IntegrityError:
-        return jsonify({"message": "Code already in use!"}), 400
+        return jsonify({"message": "Registration successful!"}), 200
     except Exception as e:
-        print(f"Web Registration Error: {e}")
-        return jsonify({"message": "Server error"}), 500
+        return jsonify({"message": "Error: Name or Code already taken!"}), 400
     finally:
-        if 'cursor' in locals(): cursor.close()
         if 'conn' in locals(): conn.close()
 
 def run():
-    # Render explicitly looks for this PORT variable
     port = int(os.environ.get("PORT", 8080))
-    print(f"Starting Flask on port {port}...")
     app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
