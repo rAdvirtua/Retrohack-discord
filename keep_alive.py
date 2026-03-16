@@ -5,57 +5,39 @@ import os
 
 app = Flask(__name__)
 
-# Route to serve the HTML website
 @app.route('/')
 def home():
-    # Make sure index.html is inside a folder named 'templates'!
-    return render_template('index.html')
+    return "Bot is alive and the registration page is ready!"
 
-# API Route to handle form submissions
 @app.route('/register', methods=['POST'])
 def register_team():
     data = request.json
     team_name = data.get('team_name')
     team_code = data.get('team_code')
-
-    DATABASE_URL = os.environ.get("DATABASE_URL")
+    db_url = os.environ.get("DATABASE_URL")
     
     try:
-        conn = psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(db_url)
         cursor = conn.cursor()
-        
-        # Insert the new team into PostgreSQL
-        cursor.execute(
-            "INSERT INTO teams (team_name, team_code) VALUES (%s, %s)", 
-            (team_name, team_code)
-        )
+        cursor.execute("INSERT INTO teams (team_name, team_code) VALUES (%s, %s)", (team_name, team_code))
         conn.commit()
-        success = True
-        message = "Team registered successfully! Head over to Discord to verify."
+        return jsonify({"message": "Team registered successfully!"}), 200
     except psycopg2.IntegrityError:
-        # This catches if someone tries to use a team code that already exists
-        success = False
-        message = "That Team Code is already in use!"
+        return jsonify({"message": "Code already in use!"}), 400
     except Exception as e:
-        print(f"Database error: {e}")
-        success = False
-        message = "An error occurred while saving to the database."
+        print(f"Web Registration Error: {e}")
+        return jsonify({"message": "Server error"}), 500
     finally:
-        # Always close the connection to avoid maxing out your Neon limits
         if 'cursor' in locals(): cursor.close()
         if 'conn' in locals(): conn.close()
 
-    if success:
-        return jsonify({"message": message}), 200
-    else:
-        return jsonify({"message": message}), 400
-
 def run():
-    # Render assigns a dynamic port, so we must use os.environ.get
+    # Render explicitly looks for this PORT variable
     port = int(os.environ.get("PORT", 8080))
+    print(f"Starting Flask on port {port}...")
     app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run)
-    t.daemon = True 
+    t.daemon = True
     t.start()
