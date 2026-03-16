@@ -5,6 +5,10 @@ from threading import Thread
 
 app = Flask(__name__)
 
+# Helper to get DB connection
+def get_db_conn():
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -13,42 +17,65 @@ def home():
 def register_team():
     data = request.json
     team_name = data.get('team_name')
-    usernames = data.get('usernames') # This is a list now
+    usernames = data.get('usernames', [])
     
-    db_url = os.environ.get("DATABASE_URL")
+    if not team_name or not usernames:
+        return jsonify({"message": "Missing team name or members!"}), 400
+
+    conn = None
     try:
-        conn = psycopg2.connect(db_url)
+        conn = get_db_conn()
         cur = conn.cursor()
         
-        # Insert each member as a separate row tied to the same team name
+        # 1. Check if team name is already taken
+        cur.execute("SELECT id FROM teams WHERE team_name = %s LIMIT 1", (team_name,))
+        if cur.fetchone():
+            return jsonify({"message": "This Team Name is already taken!"}), 400
+
+        # 2. Insert all members
         for user in usernames:
+            clean_user = user.lower().replace('@', '').strip()
             cur.execute(
                 "INSERT INTO teams (team_name, team_code, discord_username) VALUES (%s, %s, %s)",
-                (team_name, "AUTO", user) # 'AUTO' placeholder as bot handles creation
+                (team_name, "HACK26", clean_user)
             )
+        
         conn.commit()
-        return jsonify({"message": f"Team {team_name} registered! Everyone can now join Discord."}), 200
+        return jsonify({"message": f"Success! Team '{team_name}' registered with {len(usernames)} members."}), 200
+    
     except Exception as e:
-        return jsonify({"message": "Team name already exists or database error."}), 400
+        print(f"Registration Error: {e}")
+        return jsonify({"message": "Database error. Please try again later."}), 500
     finally:
-        if 'conn' in locals(): conn.close()
+        if conn: conn.close()
 
 @app.route('/status/<username>')
 def check_status(username):
-    db_url = os.environ.get("DATABASE_URL")
+    # Decode and clean the username
+    clean_user = username.lower().replace('@', '').strip()
+    
+    conn = None
     try:
-        conn = psycopg2.connect(db_url)
+        conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute("SELECT team_name FROM teams WHERE discord_username = %s", (username.lower(),))
+        cur.execute("SELECT team_name FROM teams WHERE discord_username = %s", (clean_user,))
         res = cur.fetchone()
+        
         if res:
-            return jsonify({"message": f"Verified! You are in Team: **{res[0]}**"}), 200
-        return jsonify({"message": "No team found for this username. Ask your leader to register you!"}), 404
+            return jsonify({"message": f"Status: Registered! You belong to Team: {res[0]}"}), 200
+        else:
+            return jsonify({"message": "No registration found. Ask your leader to register you."}), 404
+            
+    except Exception as e:
+        print(f"Status Error: {e}")
+        return jsonify({"message": "Error checking status."}), 500
     finally:
-        if 'conn' in locals(): conn.close()
+        if conn: conn.close()
 
 def run():
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
-    Thread(target=run, daemon=True).start()
+    t = Thread(target=run, daemon=True)
+    t.start()
