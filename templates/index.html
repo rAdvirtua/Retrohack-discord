@@ -4,52 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RetroHack 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        .card { background: #313244; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        :root {
+            --neon-cyan: #22d3ee;
+            --neon-pink: #ec4899;
+            --overlay-blue: rgba(10, 10, 35, 0.65); /* Blue overlay effect */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Press Start 2P', cursive;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Layered Background: Gradient Overlay + Pixel Art */
+            background: 
+                linear-gradient(var(--overlay-blue), var(--overlay-blue)),
+                url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* CRT SCANLINE OVERLAY */
+        body:after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            z-index: 100;
+            background-size: 100% 4px;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .card {
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            padding: 30px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 4px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: inset 0 1px 1px 0 rgba(255,255,255,0.15), 0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(34,211,238,0.3);
+            z-index: 10;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--neon-pink);
+            font-size: 16px;
+            text-shadow: 0 0 10px rgba(236,72,153,0.8);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--neon-cyan);
+            border: none;
+            color: #000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 4px 4px 0px #083344;
+            transition: 0.1s;
+        }
+
+        button:hover {
+            background: var(--neon-pink);
+            box-shadow: 4px 4px 0px #500724;
+            transform: translate(-2px, -2px);
+        }
+
+        button:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0px #500724;
+        }
+
+        .m-in { border-left: 4px solid var(--neon-pink); }
+
+        .msg {
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 8px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed #fff;
+            line-height: 1.8;
+        }
+
+        .success { color: #4ade80; border-color: #4ade80; text-shadow: 0 0 5px #4ade80; }
+        .error { color: #f87171; border-color: #f87171; text-shadow: 0 0 5px #f87171; }
+
+        .join-btn {
+            display: block;
+            margin-top: 15px;
+            padding: 12px;
+            background: transparent;
+            color: var(--neon-pink);
+            border: 2px solid var(--neon-pink);
+            text-decoration: none;
+            text-align: center;
+            font-size: 9px;
+            transition: 0.3s;
+        }
+
+        .join-btn:hover { background: var(--neon-pink); color: #000; }
         .hidden { display: none; }
-        .msg { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
-        .success { background: #a6e3a1; color: #11111b; }
-        .error { background: #f38ba8; color: #11111b; }
-        .join-btn { display: block; margin-top: 15px; padding: 12px; background: #11111b; color: #a6e3a1; border: 2px solid #a6e3a1; border-radius: 8px; text-decoration: none; text-align: center; }
+
+        @media (max-width: 480px) {
+            .card { padding: 20px; }
+            h2 { font-size: 14px; }
+            input, select, button { font-size: 9px; }
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 style="text-align: center; color: #89b4fa;">🚀 RetroHack 2026</h2>
+        <h2>RETROHACK_2026<br>NODE_INITIALIZED</h2>
+        
         <select id="role" onchange="upd()">
-            <option value="leader">Register Team</option>
-            <option value="member">Check Status</option>
+            <option value="leader">ACCESS_LEADER</option>
+            <option value="member">QUERY_MEMBER</option>
         </select>
+
         <div id="L">
-            <input type="text" id="tn" placeholder="Team Name">
-            <input type="text" id="lu" placeholder="Your Discord Username">
+            <input type="text" id="tn" placeholder="TEAM_NAME">
+            <input type="text" id="lu" placeholder="DISCORD_USER">
             <div id="mems"></div>
-            <button onclick="add()" style="background:#fab387">+ Teammate</button>
-            <button onclick="reg()">Register</button>
+            <button onclick="add()" style="background:#fab387; box-shadow: 4px 4px 0px #7c2d12;">+ ADD_UNIT</button>
+            <button onclick="reg()">SUBMIT_DATA</button>
         </div>
+
         <div id="M" class="hidden">
-            <input type="text" id="cu" placeholder="Discord Username">
-            <button onclick="chk()" style="background:#cba6f7">Verify Me</button>
+            <input type="text" id="cu" placeholder="USER_ID">
+            <button onclick="chk()" style="background:#cba6f7; box-shadow: 4px 4px 0px #4c1d95;">FETCH_STATUS</button>
         </div>
+
         <div id="msg" class="msg hidden"></div>
     </div>
+
     <script>
-        const INVITE = "https://discord.gg/Wq9ce9NByv"; // CHANGE THIS
+        const INVITE = "https://discord.gg/YOUR_INVITE"; 
 
         function upd() {
             const isL = document.getElementById('role').value === 'leader';
             document.getElementById('L').classList.toggle('hidden', !isL);
             document.getElementById('M').classList.toggle('hidden', isL);
+            document.getElementById('msg').classList.add('hidden');
         }
+
         function add() {
+            const container = document.getElementById('mems');
+            if (container.children.length >= 4) return;
             const i = document.createElement('input');
-            i.placeholder = "Teammate Username";
+            i.placeholder = "UNIT_ID";
             i.className = "m-in";
-            document.getElementById('mems').appendChild(i);
+            container.appendChild(i);
         }
+
         async function reg() {
             const usernames = [document.getElementById('lu').value, ...Array.from(document.querySelectorAll('.m-in')).map(x=>x.value)];
             const res = await fetch('/register', {
@@ -59,16 +201,18 @@
             });
             hndl(res);
         }
+
         async function chk() {
-            const res = await fetch('/status/' + document.getElementById('cu').value);
+            const res = await fetch('/status/' + encodeURIComponent(document.getElementById('cu').value));
             hndl(res);
         }
+
         async function hndl(res) {
             const d = await res.json();
             const m = document.getElementById('msg');
             m.className = `msg ${res.ok ? 'success' : 'error'}`;
-            let html = d.message;
-            if (res.ok) html += `<a href="${INVITE}" target="_blank" class="join-btn">JOIN DISCORD NOW</a>`;
+            let html = `> ${d.message}`;
+            if (res.ok) html += `<a href="${INVITE}" target="_blank" class="join-btn">ESTABLISH_UPLINK</a>`;
             m.innerHTML = html;
             m.classList.remove('hidden');
         }
