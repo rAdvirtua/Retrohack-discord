@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon Registration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #313244;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #89b4fa;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            background-color: #181825;
+            color: #cdd6f4;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #89b4fa;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #74c7ec;
+        }
+        #message {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 20px;
+        }
+        .success { color: #a6e3a1; }
+        .error { color: #f38ba8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Register Your Team</h2>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="team_name">Team Name</label>
+                <input type="text" id="team_name" placeholder="e.g., The Cyber Squad" required>
+            </div>
+            <div class="form-group">
+                <label for="team_code">Secret Team Code</label>
+                <input type="text" id="team_code" placeholder="e.g., EVF49I" maxlength="10" required>
+            </div>
+            <button type="submit">Submit Registration</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            const teamName = document.getElementById('team_name').value.trim();
+            const teamCode = document.getElementById('team_code').value.trim();
+            const messageDiv = document.getElementById('message');
+
+            messageDiv.textContent = 'Registering...';
+            messageDiv.className = '';
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ team_name: teamName, team_code: teamCode })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageDiv.textContent = result.message;
+                    messageDiv.className = 'success';
+                    document.getElementById('registrationForm').reset();
+                } else {
+                    messageDiv.textContent = result.message || 'Registration failed.';
+                    messageDiv.className = 'error';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.textContent = 'Network error. Is the server running?';
+                messageDiv.className = 'error';
+            }
+        });
+    </script>
+
+</body>
+</html>
