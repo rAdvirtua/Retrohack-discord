@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, jsonify
-import psycopg2
-import os
+import psycopg2, os
 from threading import Thread
 
 app = Flask(__name__)
 
-def get_db_conn():
+def get_db():
     return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
 @app.route('/')
@@ -13,49 +12,48 @@ def home():
     return render_template('index.html')
 
 @app.route('/register', methods=['POST'])
-def register_team():
+def register():
     data = request.json
-    team_name = data.get('team_name', '').strip()
-    usernames = data.get('usernames', [])
+    t_name = data.get('team_name', '').strip()
+    users = list(set([u.lower().replace('@','').strip() for u in data.get('usernames', []) if u]))
     
-    if not team_name or not usernames:
-        return jsonify({"message": "Fill in all fields!"}), 400
+    if not t_name or not users: return jsonify({"message": "Incomplete data!"}), 400
 
     conn = None
     try:
-        conn = get_db_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM teams WHERE team_name = %s LIMIT 1", (team_name,))
-        if cur.fetchone():
-            return jsonify({"message": "Team Name already taken!"}), 400
+        conn = get_db(); cur = conn.cursor()
+        
+        # Check Team Name
+        cur.execute("SELECT id FROM teams WHERE team_name = %s LIMIT 1", (t_name,))
+        if cur.fetchone(): return jsonify({"message": "Team name taken!"}), 400
 
-        for user in usernames:
-            clean_user = user.lower().replace('@', '').strip()
-            cur.execute(
-                "INSERT INTO teams (team_name, team_code, discord_username) VALUES (%s, %s, %s)",
-                (team_name, "HACK26", clean_user)
-            )
+        # Anti-Spam Check
+        cur.execute("SELECT discord_username FROM teams WHERE discord_username IN %s", (tuple(users),))
+        exist = cur.fetchall()
+        if exist:
+            names = ", ".join([x[0] for x in exist])
+            return jsonify({"message": f"Users already on teams: {names}"}), 400
+
+        for u in users:
+            cur.execute("INSERT INTO teams (team_name, team_code, discord_username) VALUES (%s, %s, %s)", (t_name, "HACK26", u))
+        
         conn.commit()
-        return jsonify({"message": f"Team {team_name} is being built in Discord!"}), 200
+        return jsonify({"message": f"Team {t_name} is being built!"}), 200
     except Exception as e:
-        return jsonify({"message": "Database Error"}), 500
+        return jsonify({"message": "Error registering team."}), 500
     finally:
         if conn: conn.close()
 
-@app.route('/status/<username>')
-def check_status(username):
-    clean_user = username.lower().replace('@', '').strip()
+@app.route('/status/<user>')
+def status(user):
+    u = user.lower().replace('@','').strip()
     conn = None
     try:
-        conn = get_db_conn()
-        cur = conn.cursor()
-        cur.execute("SELECT team_name FROM teams WHERE discord_username = %s", (clean_user,))
+        conn = get_db(); cur = conn.cursor()
+        cur.execute("SELECT team_name FROM teams WHERE discord_username = %s", (u,))
         res = cur.fetchone()
-        if res:
-            return jsonify({"message": f"Verified! You are in Team: {res[0]}"}), 200
+        if res: return jsonify({"message": f"You are in Team: {res[0]}"}), 200
         return jsonify({"message": "No registration found."}), 404
-    except Exception as e:
-        return jsonify({"message": "Error"}), 500
     finally:
         if conn: conn.close()
 
