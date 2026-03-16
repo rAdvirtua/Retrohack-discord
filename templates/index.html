@@ -9,33 +9,33 @@
         :root {
             --neon-cyan: #22d3ee;
             --neon-pink: #ec4899;
-            --scroll: 0; /* Updated by JS */
         }
 
         body {
             margin: 0;
             padding: 0;
             font-family: 'Press Start 2P', cursive;
-            min-height: 200vh; /* Necessary to allow scrolling for the effect */
+            min-height: 200vh;
             color: #fff;
             background-color: #020205;
+            overflow-x: hidden;
         }
 
-        /* DYNAMIC OVERLAY BACKGROUND */
+        /* --- DYNAMIC BACKGROUND --- */
         #dynamic-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
-            background-image: url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg');
+            /* Start with a neutral state, JS will override this instantly */
+            background-color: #020205;
             background-size: cover;
+            background-position: center 0%;
             background-attachment: fixed;
             transition: background 0.1s ease-out;
         }
 
-        /* CRT SCANLINE OVERLAY */
+        /* CRT SCANLINE EFFECT */
         body:after {
             content: " ";
             display: block;
@@ -52,11 +52,43 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding-top: 10vh;
-            padding-bottom: 20vh;
         }
 
+        /* --- THE MASSIVE TITLE --- */
+        header {
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: clamp(40px, 12vw, 130px); 
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: -0.05em; 
+            line-height: 0.9;
+            margin: 0;
+            text-shadow: 8px 8px 0px rgba(0,0,0,0.8), 0 0 30px rgba(236, 72, 153, 0.3);
+            white-space: nowrap;
+        }
+
+        .hero-title span { color: var(--neon-pink); }
+
+        .scroll-hint {
+            margin-top: 40px;
+            font-size: 10px;
+            color: var(--neon-cyan);
+            letter-spacing: 0.5em;
+            animation: pulse 2s infinite;
+            text-transform: uppercase;
+        }
+
+        /* --- FORM CARD --- */
         .card {
             background: rgba(10, 10, 25, 0.85);
             backdrop-filter: blur(15px);
@@ -68,84 +100,22 @@
             max-width: 420px;
             box-shadow: 0 20px 50px rgba(0,0,0,1), 0 0 20px rgba(34,211,238,0.2);
             z-index: 10;
-            margin-bottom: 50px;
+            margin-bottom: 100px;
         }
 
-        h2 {
-            text-align: center;
-            color: var(--neon-pink);
-            font-size: 16px;
-            text-shadow: 0 0 10px rgba(236,72,153,0.8);
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: var(--neon-cyan);
-            border: none;
-            color: #000;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 12px;
-            box-shadow: 4px 4px 0px #083344;
-            transition: 0.1s;
-        }
-
-        button:hover {
-            background: var(--neon-pink);
-            box-shadow: 4px 4px 0px #500724;
-            transform: translate(-2px, -2px);
-        }
-
-        .msg {
-            margin-top: 20px;
-            padding: 12px;
-            font-size: 8px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px dashed #fff;
-        }
-
-        .join-btn {
-            display: block;
-            margin-top: 15px;
-            padding: 12px;
-            color: var(--neon-pink);
-            border: 2px solid var(--neon-pink);
-            text-decoration: none;
-            text-align: center;
-            font-size: 9px;
-        }
-
+        h2 { text-align: center; color: var(--neon-pink); font-size: 14px; margin-bottom: 25px; line-height: 1.6; }
+        select, input { width: 100%; padding: 14px; margin: 10px 0; background: rgba(0, 0, 0, 0.7); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); font-family: 'Press Start 2P', cursive; font-size: 10px; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 15px; background: var(--neon-cyan); border: none; color: #000; font-family: 'Press Start 2P', cursive; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 12px; box-shadow: 4px 4px 0px #083344; }
+        button:hover { background: var(--neon-pink); box-shadow: 4px 4px 0px #500724; transform: translate(-2px, -2px); }
+        .msg { margin-top: 20px; padding: 12px; font-size: 8px; text-align: center; background: rgba(0, 0, 0, 0.5); border: 1px dashed #fff; }
+        .join-btn { display: block; margin-top: 15px; padding: 12px; color: var(--neon-pink); border: 2px solid var(--neon-pink); text-decoration: none; text-align: center; font-size: 9px; }
         .hidden { display: none; }
-
-        /* PARALLAX SCROLL INDICATOR */
-        .scroll-hint {
-            text-align: center;
-            font-size: 8px;
-            color: var(--neon-cyan);
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        @media (max-width: 480px) {
+            .hero-title { font-size: 11vw; }
+            .card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -153,14 +123,13 @@
     <div id="dynamic-bg"></div>
 
     <div class="container">
-        <header style="height: 60vh; display: flex; flex-direction: column; justify-content: center; text-align: center;">
-            <h1 style="font-size: 30px; text-shadow: 5px 5px 0px #000;">RETRO<span style="color:var(--neon-pink)">HACK</span></h1>
+        <header>
+            <h1 class="hero-title">RETRO<span>HACK</span></h1>
             <p class="scroll-hint">SCROLL_DOWN_FOR_UPLINK</p>
         </header>
 
         <div class="card">
             <h2>SYSTEM_ACCESS_NODE</h2>
-            
             <select id="role" onchange="upd()">
                 <option value="leader">LEADER_REGISTRATION</option>
                 <option value="member">STATUS_CHECK</option>
@@ -178,27 +147,25 @@
                 <input type="text" id="cu" placeholder="DISCORD_HANDLE">
                 <button onclick="chk()" style="background:#cba6f7; box-shadow: 4px 4px 0px #4c1d95;">VERIFY_UPLINK</button>
             </div>
-
             <div id="msg" class="msg hidden"></div>
         </div>
     </div>
 
     <script>
         const INVITE = "https://discord.gg/YOUR_CODE"; 
+        const BG_IMG = "https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg";
 
-        // --- DYNAMIC SCROLL OVERLAY LOGIC ---
-        window.addEventListener('scroll', () => {
+        // Function to apply the overlay based on current scroll
+        function updateOverlay() {
             const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPct = window.scrollY / scrollHeight;
-            
+            const scrollPct = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
             const bg = document.getElementById('dynamic-bg');
             
-            // Calculate colors based on your JS snippet logic
+            // Logic from your provided script
             const opacity = 0.4 + (scrollPct * 0.4);
             const rTop = 255 - (scrollPct * 150);
             const gTop = 100 - (scrollPct * 100);
             const bTop = 50 + (scrollPct * 50);
-            
             const rBot = 20 - (scrollPct * 20);
             const gBot = 10 - (scrollPct * 10);
             const bBot = 40 + (scrollPct * 20);
@@ -206,12 +173,15 @@
             const colorTop = `rgba(${rTop}, ${gTop}, ${bTop}, ${opacity})`;
             const colorBot = `rgba(${rBot}, ${gBot}, ${bBot}, 0.9)`;
             
-            // Apply the dynamic gradient and move background position
-            bg.style.backgroundImage = `linear-gradient(${colorTop}, ${colorBot}), url('https://pandadsgn.github.io/Retrohack_2026/unnamed.jpg')`;
+            bg.style.backgroundImage = `linear-gradient(${colorTop}, ${colorBot}), url('${BG_IMG}')`;
             bg.style.backgroundPosition = `50% ${scrollPct * 100}%`;
-        });
+        }
 
-        // --- REGISTRATION LOGIC ---
+        // Initialize immediately on load
+        window.addEventListener('DOMContentLoaded', updateOverlay);
+        // Update on scroll
+        window.addEventListener('scroll', updateOverlay);
+
         function upd() {
             const isL = document.getElementById('role').value === 'leader';
             document.getElementById('L').classList.toggle('hidden', !isL);
