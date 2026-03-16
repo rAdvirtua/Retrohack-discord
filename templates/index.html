@@ -1,117 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroHack 2026 | Registration</title>
+    <title>RetroHack 2026</title>
     <style>
-        body { background: #1e1e2e; color: #cdd6f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 40px; }
-        .card { background: #313244; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #89b4fa; margin-top: 0; }
-        label { display: block; margin-top: 15px; font-size: 0.9em; color: #bac2de; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #11111b; margin-top: 10px; transition: opacity 0.2s; }
-        button:hover { opacity: 0.9; }
+        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; padding: 40px; }
+        .card { background: #313244; padding: 25px; border-radius: 12px; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 6px; box-sizing: border-box;}
+        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .hidden { display: none; }
-        .secondary-btn { background: #fab387; margin-bottom: 10px; font-size: 0.8em; }
-        .status-msg { margin-top: 20px; padding: 15px; border-radius: 6px; text-align: center; font-weight: bold; }
+        .status { margin-top: 20px; padding: 15px; border-radius: 6px; text-align: center; font-weight: bold; }
         .success { background: #a6e3a1; color: #11111b; }
         .error { background: #f38ba8; color: #11111b; }
-        a { color: #1e1e2e; text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🚀 RetroHack 2026</h2>
-        
-        <label>Select your role:</label>
-        <select id="roleToggle" onchange="toggleRole()">
-            <option value="leader">Team Leader (Register Team)</option>
-            <option value="member">Team Member (Check Status)</option>
+        <h2>RetroHack Registration</h2>
+        <select id="role" onchange="updateUI()">
+            <option value="leader">I am the Leader</option>
+            <option value="member">I am a Member</option>
         </select>
 
-        <div id="leaderSection">
-            <label>Team Name</label>
-            <input type="text" id="team_name" placeholder="e.g. The Byte Busters">
-            
-            <label>Your Discord Username (Leader)</label>
-            <input type="text" id="leader_discord" placeholder="e.g. anurag_codes">
-            
-            <div id="memberContainer">
-                <label>Teammate Usernames</label>
-                </div>
-            <button type="button" class="secondary-btn" onclick="addMemberField()">+ Add Teammate</button>
-            <button onclick="submitRegistration()">Register Entire Team</button>
+        <div id="leaderUI">
+            <input type="text" id="t_name" placeholder="Team Name">
+            <input type="text" id="l_user" placeholder="Your Discord Username">
+            <div id="members"></div>
+            <button onclick="addM()" style="background:#fab387">+ Teammate</button>
+            <button onclick="reg()">Register Team</button>
         </div>
 
-        <div id="memberSection" class="hidden">
-            <label>Enter your Discord Username</label>
-            <input type="text" id="check_username" placeholder="e.g. fbiagent7324">
-            <button onclick="checkStatus()" style="background: #cba6f7;">Check Registration</button>
+        <div id="memberUI" class="hidden">
+            <input type="text" id="c_user" placeholder="Your Discord Username">
+            <button onclick="check()">Check Status</button>
         </div>
-
-        <div id="msg" class="status-msg hidden"></div>
+        <div id="msg" class="status hidden"></div>
     </div>
 
     <script>
-        const DISCORD_INVITE = "https://discord.gg/ZnUPDBNnqA"; // CHANGE THIS
-
-        function toggleRole() {
-            const isLeader = document.getElementById('roleToggle').value === 'leader';
-            document.getElementById('leaderSection').classList.toggle('hidden', !isLeader);
-            document.getElementById('memberSection').classList.toggle('hidden', isLeader);
-            document.getElementById('msg').classList.add('hidden');
+        const LINK = "YOUR_DISCORD_LINK"; 
+        function updateUI() {
+            const isL = document.getElementById('role').value === 'leader';
+            document.getElementById('leaderUI').classList.toggle('hidden', !isL);
+            document.getElementById('memberUI').classList.toggle('hidden', isL);
         }
-
-        function addMemberField() {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = "Teammate Discord Username";
-            input.className = "teammate-input";
-            document.getElementById('memberContainer').appendChild(input);
+        function addM() {
+            const i = document.createElement('input');
+            i.placeholder = "Teammate Discord Username";
+            i.className = "m-input";
+            document.getElementById('members').appendChild(i);
         }
-
-        async function submitRegistration() {
-            const teamName = document.getElementById('team_name').value.trim();
-            const leader = document.getElementById('leader_discord').value.trim();
-            const teammates = Array.from(document.querySelectorAll('.teammate-input')).map(i => i.value.trim());
-            
-            if (!teamName || !leader) return alert("Please fill in Team Name and Leader Username.");
-
-            const usernames = [leader, ...teammates].filter(u => u !== "");
+        async function reg() {
+            const usernames = [document.getElementById('l_user').value, ...Array.from(document.querySelectorAll('.m-input')).map(x=>x.value)];
             const res = await fetch('/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ team_name: teamName, usernames: usernames })
+                body: JSON.stringify({team_name: document.getElementById('t_name').value, usernames})
             });
-
-            handleResponse(res);
+            handle(res);
         }
-
-        async function checkStatus() {
-            const username = document.getElementById('check_username').value.trim();
-            if (!username) return alert("Enter your username first.");
-
-            const res = await fetch(`/status/${encodeURIComponent(username)}`);
-            handleResponse(res);
+        async function check() {
+            const res = await fetch('/status/' + document.getElementById('c_user').value);
+            handle(res);
         }
-
-        async function handleResponse(res) {
-            const msgDiv = document.getElementById('msg');
-            msgDiv.classList.remove('hidden');
-            
-            try {
-                const data = await res.json();
-                msgDiv.className = `status-msg ${res.ok ? 'success' : 'error'}`;
-                let content = data.message;
-                if (res.ok) {
-                    content += `<br><br><strong><a href="${DISCORD_INVITE}" target="_blank">Join Discord Server</a></strong>`;
-                }
-                msgDiv.innerHTML = content;
-            } catch (e) {
-                msgDiv.className = 'status-msg error';
-                msgDiv.innerText = "Server Error: Invalid response from server.";
-            }
+        async function handle(res) {
+            const d = await res.json();
+            const m = document.getElementById('msg');
+            m.className = `status ${res.ok ? 'success' : 'error'}`;
+            m.innerHTML = d.message + (res.ok ? `<br><br><a href="${LINK}">Join Discord</a>` : '');
+            m.classList.remove('hidden');
         }
     </script>
 </body>
