@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Bot is alive and the registration page is ready!"
+    return render_template('index.html')
 
 @app.route('/register', methods=['POST'])
 def register_team():
