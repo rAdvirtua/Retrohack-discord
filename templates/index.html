@@ -1,72 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RetroHack 2026</title>
     <style>
-        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; padding: 40px; }
-        .card { background: #313244; padding: 25px; border-radius: 12px; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 6px; box-sizing: border-box;}
-        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        body { background: #1e1e2e; color: #cdd6f4; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box;}
+        .card { background: #313244; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #89b4fa; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #181825; border: 1px solid #45475a; color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #89b4fa; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 16px; }
         .hidden { display: none; }
-        .status { margin-top: 20px; padding: 15px; border-radius: 6px; text-align: center; font-weight: bold; }
+        .msg { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
         .success { background: #a6e3a1; color: #11111b; }
         .error { background: #f38ba8; color: #11111b; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>RetroHack Registration</h2>
-        <select id="role" onchange="updateUI()">
-            <option value="leader">I am the Leader</option>
-            <option value="member">I am a Member</option>
+        <h2>🚀 RetroHack 2026</h2>
+        <select id="role" onchange="upd()">
+            <option value="leader">Leader (Register)</option>
+            <option value="member">Member (Check)</option>
         </select>
-
-        <div id="leaderUI">
-            <input type="text" id="t_name" placeholder="Team Name">
-            <input type="text" id="l_user" placeholder="Your Discord Username">
-            <div id="members"></div>
-            <button onclick="addM()" style="background:#fab387">+ Teammate</button>
-            <button onclick="reg()">Register Team</button>
+        <div id="L">
+            <input type="text" id="tn" placeholder="Team Name">
+            <input type="text" id="lu" placeholder="Your Discord Username">
+            <div id="mems"></div>
+            <button onclick="add()" style="background:#fab387">+ Teammate</button>
+            <button onclick="reg()">Submit Team</button>
         </div>
-
-        <div id="memberUI" class="hidden">
-            <input type="text" id="c_user" placeholder="Your Discord Username">
-            <button onclick="check()">Check Status</button>
+        <div id="M" class="hidden">
+            <input type="text" id="cu" placeholder="Your Discord Username">
+            <button onclick="chk()" style="background:#cba6f7">Check Status</button>
         </div>
-        <div id="msg" class="status hidden"></div>
+        <div id="msg" class="msg hidden"></div>
     </div>
-
     <script>
-        const LINK = "https://discord.gg/uazpQESzus"; 
-        function updateUI() {
+        function upd() {
             const isL = document.getElementById('role').value === 'leader';
-            document.getElementById('leaderUI').classList.toggle('hidden', !isL);
-            document.getElementById('memberUI').classList.toggle('hidden', isL);
+            document.getElementById('L').classList.toggle('hidden', !isL);
+            document.getElementById('M').classList.toggle('hidden', isL);
         }
-        function addM() {
+        function add() {
             const i = document.createElement('input');
             i.placeholder = "Teammate Discord Username";
-            i.className = "m-input";
-            document.getElementById('members').appendChild(i);
+            i.className = "m-in";
+            document.getElementById('mems').appendChild(i);
         }
         async function reg() {
-            const usernames = [document.getElementById('l_user').value, ...Array.from(document.querySelectorAll('.m-input')).map(x=>x.value)];
+            const usernames = [document.getElementById('lu').value, ...Array.from(document.querySelectorAll('.m-in')).map(x=>x.value)];
             const res = await fetch('/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({team_name: document.getElementById('t_name').value, usernames})
+                body: JSON.stringify({team_name: document.getElementById('tn').value, usernames})
             });
-            handle(res);
+            hndl(res);
         }
-        async function check() {
-            const res = await fetch('/status/' + document.getElementById('c_user').value);
-            handle(res);
+        async function chk() {
+            const res = await fetch('/status/' + document.getElementById('cu').value);
+            hndl(res);
         }
-        async function handle(res) {
+        async function hndl(res) {
             const d = await res.json();
             const m = document.getElementById('msg');
-            m.className = `status ${res.ok ? 'success' : 'error'}`;
-            m.innerHTML = d.message + (res.ok ? `<br><br><a href="${LINK}">Join Discord</a>` : '');
+            m.className = `msg ${res.ok ? 'success' : 'error'}`;
+            m.innerHTML = d.message + (res.ok ? '<br><br><b>Join the Discord server now!</b>' : '');
             m.classList.remove('hidden');
         }
     </script>
