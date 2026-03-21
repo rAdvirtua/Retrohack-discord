@@ -9,18 +9,18 @@
         :root {
             --neon-cyan: #22d3ee;
             --neon-pink: #ec4899;
-            --glass-bg: rgba(10, 10, 20, 0.85); /* Darker for better text contrast */
+            /* High-contrast Translucent Background */
+            --glass-bg: rgba(7, 7, 15, 0.75); 
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Press Start 2P', cursive;
-            min-height: 200vh;
+            min-height: 180vh;
             color: #fff;
             background-color: #020205;
             overflow-x: hidden;
-            -webkit-font-smoothing: none; /* Keeps pixel font sharp */
+            -webkit-font-smoothing: none; /* Keeps the pixel font sharp */
         }
 
         /* --- DYNAMIC BACKGROUND --- */
@@ -29,7 +29,6 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: -1;
-            background-color: #020205;
             background-size: cover;
             background-position: center 0%;
             background-attachment: fixed;
@@ -42,7 +41,7 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
             z-index: 100;
             background-size: 100% 4px;
             pointer-events: none;
@@ -56,17 +55,14 @@
             width: 100%;
         }
 
-        /* --- MASSIVE READABLE TITLE --- */
+        /* --- MASSIVE HEADER --- */
         header {
-            height: 85vh;
+            height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
         }
 
         .hero-title {
@@ -77,136 +73,91 @@
             letter-spacing: -0.05em; 
             line-height: 1;
             margin: 0;
-            /* High-contrast shadow for readability */
-            text-shadow: 
-                6px 6px 0px #000, 
-                10px 10px 0px rgba(0,0,0,0.5),
-                0 0 20px rgba(34, 211, 238, 0.4);
+            /* Heavy shadow for maximum readability */
+            text-shadow: 6px 6px 0px #000, 0 0 20px rgba(34, 211, 238, 0.5);
             white-space: nowrap;
         }
 
-        .hero-title span { color: var(--neon-pink); }
+        .hero-title span { color: var(--neon-pink); text-shadow: 6px 6px 0px #000, 0 0 20px rgba(236, 72, 153, 0.5); }
 
         .scroll-hint {
-            margin-top: 50px;
-            font-size: 10px;
+            margin-top: 40px;
+            font-size: 9px;
             color: var(--neon-cyan);
             letter-spacing: 0.4em;
             animation: pulse 2s infinite;
             text-shadow: 2px 2px 0px #000;
         }
 
-        /* --- GLASSMORPHIC FORM CARD --- */
+        /* --- GLASSMORPHIC CARD --- */
         .card {
             background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(160%);
-            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            /* Strong blur to "mute" background details */
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
             padding: 40px;
-            border: 3px solid var(--neon-cyan);
-            border-radius: 2px; /* Sharper retro corners */
+            border: 2px solid var(--neon-cyan);
+            border-radius: 4px;
             width: 90%;
-            max-width: 460px;
-            box-shadow: 
-                0 25px 50px rgba(0,0,0,0.9), 
-                inset 0 0 15px rgba(34, 211, 238, 0.1);
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 15px rgba(34, 211, 238, 0.1);
             z-index: 10;
-            margin-bottom: 120px;
+            margin-bottom: 100px;
             box-sizing: border-box;
         }
 
         .card h2 { 
-            text-align: center; 
-            color: var(--neon-pink); 
-            font-size: 14px; 
-            margin-bottom: 35px; 
-            line-height: 1.6;
+            text-align: center; color: var(--neon-pink); font-size: 13px; 
+            margin-bottom: 30px; letter-spacing: 0.1em;
             text-shadow: 2px 2px 0px #000;
         }
 
-        /* Labels for visibility */
-        .input-group label {
-            display: block;
-            font-size: 8px;
-            color: var(--neon-cyan);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
         select, input { 
-            width: 100%; 
-            padding: 16px; 
-            margin-bottom: 20px; 
-            background: rgba(0, 0, 0, 0.8); 
-            border: 2px solid var(--neon-cyan); 
+            width: 100%; padding: 16px; margin-bottom: 20px; 
+            background: rgba(0, 0, 0, 0.6); 
+            border: 1px solid var(--neon-cyan); 
             color: #fff; 
             font-family: 'Press Start 2P', cursive; 
-            font-size: 11px; 
+            font-size: 10px; 
             box-sizing: border-box; 
             outline: none;
-            transition: 0.2s;
+            text-shadow: 1px 1px 0px #000;
         }
 
-        input:focus {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
+        input:focus { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
 
         button { 
-            width: 100%; 
-            padding: 18px; 
-            background: var(--neon-cyan); 
-            border: none; 
-            color: #000; 
-            font-family: 'Press Start 2P', cursive; 
-            font-size: 12px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 10px; 
-            box-shadow: 5px 5px 0px #083344;
-            text-transform: uppercase;
+            width: 100%; padding: 18px; 
+            background: var(--neon-cyan); border: none; 
+            color: #000; font-family: 'Press Start 2P', cursive; 
+            font-size: 11px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; box-shadow: 5px 5px 0px #083344;
+            transition: 0.1s;
         }
 
-        button:hover { 
-            background: var(--neon-pink); 
-            box-shadow: 5px 5px 0px #500724; 
-            transform: translate(-2px, -2px); 
-        }
-
-        button:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
+        button:hover { background: var(--neon-pink); box-shadow: 5px 5px 0px #500724; transform: translate(-2px, -2px); }
+        button:active { transform: translate(2px, 2px); box-shadow: none; }
 
         .msg { 
-            margin-top: 25px; 
-            padding: 15px; 
-            font-size: 9px; 
-            text-align: center; 
-            background: rgba(0, 0, 0, 0.6); 
-            border: 1px dashed #fff; 
-            line-height: 1.6;
+            margin-top: 25px; padding: 15px; font-size: 8px; 
+            text-align: center; border: 1px dashed #fff; 
+            background: rgba(0,0,0,0.3); text-shadow: 1px 1px 0px #000;
         }
 
         .join-btn { 
-            display: block; 
-            margin-top: 20px; 
-            padding: 14px; 
-            color: var(--neon-pink); 
-            border: 2px solid var(--neon-pink); 
-            text-decoration: none; 
-            text-align: center; 
-            font-size: 10px; 
-            background: rgba(0,0,0,0.4);
+            display: block; margin-top: 15px; padding: 12px; 
+            color: var(--neon-pink); border: 2px solid var(--neon-pink); 
+            text-decoration: none; text-align: center; font-size: 9px;
+            background: rgba(0,0,0,0.2); transition: 0.2s;
         }
+        .join-btn:hover { background: var(--neon-pink); color: #000; }
 
         .hidden { display: none; }
-        
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         @media (max-width: 480px) {
-            .hero-title { font-size: 11vw; }
+            .hero-title { font-size: 10vw; }
             .card { padding: 25px; }
-            input, select, button { font-size: 9px; }
         }
     </style>
 </head>
@@ -229,15 +180,15 @@
             </select>
 
             <div id="L">
-                <input type="text" id="tn" placeholder="TEAM_NAME">
-                <input type="text" id="lu" placeholder="DISCORD_HANDLE">
+                <input type="text" id="tn" placeholder="TEAM_NAME" autocomplete="off">
+                <input type="text" id="lu" placeholder="DISCORD_HANDLE" autocomplete="off">
                 <div id="mems"></div>
-                <button onclick="add()" style="background:#fab387; box-shadow: 5px 5px 0px #7c2d12; margin-bottom: 10px;">+ ADD_MEMBER</button>
+                <button onclick="add()" style="background:#fab387; box-shadow: 5px 5px 0px #7c2d12; margin-bottom: 15px;">+ ADD_UNIT</button>
                 <button onclick="reg()">SUBMIT_UPLINK</button>
             </div>
 
             <div id="M" class="hidden">
-                <input type="text" id="cu" placeholder="YOUR_HANDLE">
+                <input type="text" id="cu" placeholder="YOUR_HANDLE" autocomplete="off">
                 <button onclick="chk()" style="background:#cba6f7; box-shadow: 5px 5px 0px #4c1d95;">FETCH_DATA</button>
             </div>
             
@@ -254,8 +205,7 @@
             const scrollPct = scrollHeight > 0 ? window.scrollY / scrollHeight : 0;
             const bg = document.getElementById('dynamic-bg');
             
-            // Logic to calculate colors
-            const opacity = 0.5 + (scrollPct * 0.3); // Increased base opacity for readability
+            const opacity = 0.5 + (scrollPct * 0.3); 
             const rTop = 255 - (scrollPct * 150);
             const gTop = 100 - (scrollPct * 100);
             const bTop = 50 + (scrollPct * 50);
@@ -263,14 +213,10 @@
             const gBot = 10 - (scrollPct * 10);
             const bBot = 40 + (scrollPct * 20);
 
-            const colorTop = `rgba(${rTop}, ${gTop}, ${bTop}, ${opacity})`;
-            const colorBot = `rgba(${rBot}, ${gBot}, ${bBot}, 0.95)`;
-            
-            bg.style.backgroundImage = `linear-gradient(${colorTop}, ${colorBot}), url('${BG_IMG}')`;
+            bg.style.backgroundImage = `linear-gradient(rgba(${rTop},${gTop},${bTop},${opacity}), rgba(${rBot},${gBot},${bBot},0.95)), url('${BG_IMG}')`;
             bg.style.backgroundPosition = `50% ${scrollPct * 100}%`;
         }
 
-        // Initialize immediately
         window.addEventListener('DOMContentLoaded', updateOverlay);
         window.addEventListener('scroll', updateOverlay);
 
