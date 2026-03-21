@@ -7,10 +7,12 @@ app = Flask(__name__)
 
 # --- DATABASE HELPER ---
 def get_db_conn():
+    # Hugging Face will pull this from your "Secrets" tab
     return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
 @app.route('/')
 def home():
+    # Renders your glassmorphic index.html from /templates
     return render_template('index.html')
 
 @app.route('/register', methods=['POST'])
@@ -20,7 +22,6 @@ def register_team():
     
     # Clean, lowercase, and deduplicate the input usernames
     raw_usernames = data.get('usernames', [])
-    # Set comprehension handles deduplication automatically
     usernames = list({str(u).lower().replace('@', '').strip() for u in raw_usernames if u})
 
     # --- VALIDATION ---
@@ -35,24 +36,22 @@ def register_team():
         conn = get_db_conn()
         cur = conn.cursor()
 
-        # 1. ANTI-SPAM: Check if Team Name exists (Case-Insensitive)
+        # 1. ANTI-SPAM: Check if Team Name exists
         cur.execute("SELECT 1 FROM teams WHERE LOWER(team_name) = LOWER(%s) LIMIT 1", (team_name,))
         if cur.fetchone():
             return jsonify({"message": f"The team name '{team_name}' is already taken!"}), 400
 
         # 2. THE IRONCLAD CHECK: Is ANY submitted username already registered?
-        # Using '= ANY(%s)' is the most reliable way to check a list against a column
         cur.execute("SELECT discord_username FROM teams WHERE discord_username = ANY(%s)", (usernames,))
         existing_users = cur.fetchall()
         
         if existing_users:
-            # Create a string of the usernames that are already taken
             taken_names = ", ".join([row[0] for row in existing_users])
             return jsonify({
                 "message": f"Registration Denied: {taken_names} already belong to a team!"
             }), 400
 
-        # 3. INSERTION: Only runs if all checks above passed
+        # 3. INSERTION: Commit to the Grid
         for user in usernames:
             cur.execute(
                 "INSERT INTO teams (team_name, team_code, discord_username) VALUES (%s, %s, %s)",
@@ -71,7 +70,6 @@ def register_team():
 
 @app.route('/status/<username>')
 def check_status(username):
-    # Clean the username for the check
     user_to_check = str(username).lower().replace('@', '').strip()
     
     conn = None
@@ -95,9 +93,12 @@ def check_status(username):
 
 # --- SERVER STARTUP ---
 def run():
-    port = int(os.environ.get("PORT", 8080))
+    # MANDATORY: Hugging Face Spaces strictly requires port 7860
+    # The SDK will fail to build if this is anything else.
+    port = 7860
     app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
+    # Daemon thread ensures the server doesn't block the bot's hunter loop
     t = Thread(target=run, daemon=True)
     t.start()
